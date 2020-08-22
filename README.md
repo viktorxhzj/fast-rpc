@@ -84,7 +84,7 @@ rpcFuture.get();
 // get the RPC result immediately
 rpcFuture.getNow();
 
-// add a Rpc hook
+// add a RPC hook
 rpcFuture.addRpcHook(new RpcHook() {
     @Override
     public void beforeRpc(RpcRequest rpcRequest) {
