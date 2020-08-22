@@ -29,8 +29,8 @@ public interface SimpleService {
 ```java
 public class SimpleServiceImpl implements SimpleService {
     @Override
-    public void hello(Person person) {
-        System.out.println("hello, name=" + person.getName() + ", age=" + person.getAge());
+    public String hello(Person person) {
+        return "hello, name=" + person.getName() + ", age=" + person.getAge();
     }
 }
 ```
