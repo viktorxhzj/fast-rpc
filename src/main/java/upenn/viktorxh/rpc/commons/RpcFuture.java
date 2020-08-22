@@ -40,7 +40,6 @@ public class RpcFuture {
         return request;
     }
 
-    //TODO 当调用失败时的逻辑
     public void setResponse(RpcResponse response) {
         status = response.getStatus();
         this.response = response;

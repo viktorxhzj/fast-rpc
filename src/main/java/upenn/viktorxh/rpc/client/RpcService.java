@@ -23,11 +23,7 @@ public class RpcService implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        /*
-        * 1 向rpcClient传入调用相关的参数
-        * 2 使用rpcClient内部线程池包装Request
-        * 3 阻塞等待结果返回
-        * */
+
         RpcFuture rpcFuture = rpcClient.submitRequest(targetService, method, args);
         if (rpcFuture == null) {
             return null;
