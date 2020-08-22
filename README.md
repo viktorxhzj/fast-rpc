@@ -100,7 +100,7 @@ rpcFuture.addRpcHook(new RpcHook() {
 
 
 
-## 3 Next Steps
+## Next Steps
 
 - Enable annotation-driven development
 - Enable other serialization/deserialization techniques
