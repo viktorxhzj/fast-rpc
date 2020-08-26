@@ -57,7 +57,7 @@ RpcClient rpcClient = new RpcClient("127.0.0.1", 8080);
 // RpcClient rpcClient = new RpcClient(HOST, PORT, 2000L);
 
 // discover the service
-SimpleServiceImpl simpleService = rpcClient.syncService(SimpleServiceImpl.class);
+SimpleService simpleService = rpcClient.syncService(SimpleService.class);
 
 // synchronous RPC
 String helloMsg = simpleService.hello(new Person());
@@ -73,7 +73,7 @@ rpcClient.shutDown();
 
 ```java
 // discover the service
-RpcService rpcService = rpcClient.asyncService(SimpleServiceImpl.class);
+RpcService rpcService = rpcClient.asyncService(SimpleService.class);
 
 // get a future instance as the result of the asynchronous call
 RpcFuture rpcFuture = rpcService.asyncCall("hello", new Person());
