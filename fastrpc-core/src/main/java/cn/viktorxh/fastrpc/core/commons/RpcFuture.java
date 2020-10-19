@@ -1,9 +1,11 @@
-package upenn.viktorxh.rpc.commons;
+package cn.viktorxh.fastrpc.core.commons;
 
 import lombok.extern.slf4j.Slf4j;
-import upenn.viktorxh.rpc.client.RpcHook;
+import cn.viktorxh.fastrpc.core.client.RpcHook;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Hezijian Xiao
@@ -43,6 +45,10 @@ public class RpcFuture {
     public void setResponse(RpcResponse response) {
         status = response.getStatus();
         this.response = response;
+        int a = 1;
+        RpcResponse r = response;
+
+        int b = 2;
         signal();
         fireAfterRpc();
     }

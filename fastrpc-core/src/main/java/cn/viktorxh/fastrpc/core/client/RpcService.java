@@ -1,8 +1,10 @@
-package upenn.viktorxh.rpc.client;
+package cn.viktorxh.fastrpc.core.client;
 
 import lombok.extern.slf4j.Slf4j;
-import upenn.viktorxh.rpc.commons.RpcFuture;
+import cn.viktorxh.fastrpc.core.commons.RpcFuture;
+import cn.viktorxh.fastrpc.core.commons.RpcMethod;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -12,6 +14,7 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 public class RpcService implements InvocationHandler {
+    private static final Class<?> ANNOTATION = RpcMethod.class;
 
     private RpcClient rpcClient;
     private Class<?> targetService;
@@ -23,16 +26,17 @@ public class RpcService implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-        RpcFuture rpcFuture = rpcClient.submitRequest(targetService, method, args);
-        if (rpcFuture == null) {
-            return null;
+        Annotation[] annotations = method.getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType() == ANNOTATION) {
+                RpcFuture rpcFuture = rpcClient.submitRequest(targetService, method, args);
+                return rpcFuture.get();
+            }
         }
-        return rpcFuture.get();
+        return null;
     }
 
     public RpcFuture asyncCall(String methodName, Object... args) {
-
         return rpcClient.submitRequest(targetService, methodName, args);
     }
 }

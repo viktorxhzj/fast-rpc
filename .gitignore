@@ -1,6 +1,6 @@
 .idea
-target
-src/test
+*/target
+*/src/test
 
-*.iml
+*/*.iml
 

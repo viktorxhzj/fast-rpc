@@ -1,15 +1,16 @@
-package upenn.viktorxh.rpc.client;
+package cn.viktorxh.fastrpc.core.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
-import upenn.viktorxh.rpc.commons.*;
+import cn.viktorxh.fastrpc.core.commons.*;
+import cn.viktorxh.fastrpc.core.serialization.RpcDecoder;
+import cn.viktorxh.fastrpc.core.serialization.RpcEncoder;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -21,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Hezijian Xiao
@@ -39,14 +39,13 @@ public class RpcClient {
     private int connectionIdx = -1; // index for connections round-robin
     private Map<Class<?>, Object> syncServiceMap;
     private Map<Class<?>, RpcService> asyncServiceMap;
-    private volatile Map<UUID, RpcFuture> futureMap;
+    private Map<UUID, RpcFuture> futureMap;
     private ThreadPoolExecutor executor;
-    private AtomicInteger at = new AtomicInteger(0);
 
     private class RpcClientHandler extends ChannelInboundHandlerAdapter {
         // eventloop thread
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        public void channelRead(ChannelHandlerContext ctx, Object msg) {
             final RpcResponse response = (RpcResponse) msg;
 
             // a successful reponse
@@ -63,7 +62,7 @@ public class RpcClient {
         }
 
         @Override
-        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
             if (evt instanceof IdleStateEvent) {
                 log.info("connection timesout, closing");
                 int i = 0;
@@ -84,7 +83,7 @@ public class RpcClient {
         }
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             ctx.close();
             log.warn("anomal closure of channel by server");
         }
@@ -99,22 +98,10 @@ public class RpcClient {
         futureMap = new ConcurrentHashMap<>();
         executor = new ThreadPoolExecutor(4, 8,
                 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        initNettyClient(0);
-    }
-
-    public RpcClient(String hostname, int port, long idleTime) {
-        this.hostname = hostname;
-        this.port = port;
-        syncServiceMap = new HashMap<>();
-        asyncServiceMap = new HashMap<>();
-        futureMap = new ConcurrentHashMap<>();
-        executor = new ThreadPoolExecutor(4, 8,
-                60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        initNettyClient(idleTime);
     }
 
     // main
-    private void initNettyClient(long idleTime) {
+    public void initNettyClient(final long idleTime) {
         rpcConnections = new RpcConnection[CONNECTIONS];
         for (int i = 0; i < CONNECTIONS; i++) {
             EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -124,11 +111,11 @@ public class RpcClient {
                         .channel(NioSocketChannel.class)
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
-                            protected void initChannel(SocketChannel ch) throws Exception {
+                            protected void initChannel(SocketChannel ch) {
                                 ch.pipeline()
                                         .addLast(new IdleStateHandler(idleTime, idleTime, idleTime, TimeUnit.MILLISECONDS))
-                                        .addLast(new RpcEncoder())
-                                        .addLast(new RpcDecoder())
+                                        .addLast(new RpcEncoder(RpcRequest.class))
+                                        .addLast(new RpcDecoder(RpcResponse.class))
                                         .addLast(new RpcClientHandler());
                             }
                         });

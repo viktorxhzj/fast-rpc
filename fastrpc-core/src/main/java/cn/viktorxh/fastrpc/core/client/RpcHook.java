@@ -1,7 +1,7 @@
-package upenn.viktorxh.rpc.client;
+package cn.viktorxh.fastrpc.core.client;
 
-import upenn.viktorxh.rpc.commons.RpcRequest;
-import upenn.viktorxh.rpc.commons.RpcResponse;
+import cn.viktorxh.fastrpc.core.commons.RpcRequest;
+import cn.viktorxh.fastrpc.core.commons.RpcResponse;
 
 /**
  * @author Hezijian Xiao

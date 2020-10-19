@@ -1,9 +1,11 @@
-package upenn.viktorxh.rpc.commons;
+package cn.viktorxh.fastrpc.core.commons;
 
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Hezijian Xiao
@@ -19,10 +21,6 @@ public class RpcConnection {
         this.eventLoopGroup = eventLoopGroup;
         this.channel = channel;
         this.requestIdSet = new HashSet<>();
-    }
-
-    public EventLoopGroup getEventLoopGroup() {
-        return eventLoopGroup;
     }
 
     public boolean isClosed() {

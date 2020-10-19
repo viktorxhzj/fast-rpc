@@ -1,4 +1,4 @@
-package upenn.viktorxh.rpc.commons;
+package cn.viktorxh.fastrpc.core.commons;
 
 import java.io.Serializable;
 import java.util.UUID;

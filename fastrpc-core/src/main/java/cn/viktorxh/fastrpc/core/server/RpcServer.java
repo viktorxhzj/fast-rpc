@@ -1,4 +1,4 @@
-package upenn.viktorxh.rpc.server;
+package cn.viktorxh.fastrpc.core.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -6,10 +6,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import upenn.viktorxh.rpc.commons.RpcDecoder;
-import upenn.viktorxh.rpc.commons.RpcEncoder;
-import upenn.viktorxh.rpc.commons.RpcRequest;
-import upenn.viktorxh.rpc.commons.RpcResponse;
+import cn.viktorxh.fastrpc.core.commons.RpcRequest;
+import cn.viktorxh.fastrpc.core.commons.RpcResponse;
+import cn.viktorxh.fastrpc.core.serialization.RpcDecoder;
+import cn.viktorxh.fastrpc.core.serialization.RpcEncoder;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -33,7 +33,6 @@ public class RpcServer {
             final RpcRequest request = (RpcRequest) msg;
             ctx.channel().eventLoop().execute(() -> {
                 try {
-                    Thread.sleep(3000);
                     String className = request.getClassName();
                     String methodName = request.getMethodName();
                     Class<?> implClass = interfaceMapping.get(className);
@@ -67,10 +66,9 @@ public class RpcServer {
         interfaceMapping = new HashMap<>();
     }
 
-    public RpcServer registerService(Class<?> clazz) {
+    public void registerService(Class<?> clazz) {
         Class<?>[] superInterfaces = clazz.getInterfaces();
         interfaceMapping.put(superInterfaces[0].getName(), clazz);
-        return this;
     }
 
     // block here
@@ -86,8 +84,8 @@ public class RpcServer {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline()
-                                    .addLast(new RpcEncoder()) // outbound
-                                    .addLast(new RpcDecoder()) // inbound
+                                    .addLast(new RpcEncoder(RpcResponse.class)) // outbound
+                                    .addLast(new RpcDecoder(RpcRequest.class)) // inbound
                                     .addLast(new RpcServerHandler()); // inbound
                         }
                     })
